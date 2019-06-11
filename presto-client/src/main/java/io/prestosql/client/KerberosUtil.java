@@ -30,6 +30,11 @@ public final class KerberosUtil
         if (value.startsWith(FILE_PREFIX)) {
             value = value.substring(FILE_PREFIX.length());
         }
+        if (value.isEmpty()) {
+            // In case KRB5CCNAME is not set, we might still be able to get the ticket cache location using the Sun
+            // APIs. This allows unix clients (including MacOS) to connect despite this env variable not being set.
+            value = nullToEmpty(sun.security.krb5.internal.ccache.FileCredentialsCache.getDefaultCacheName());
+        }
         return Optional.ofNullable(emptyToNull(value));
     }
 }
